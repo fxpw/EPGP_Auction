@@ -1562,7 +1562,7 @@ local function CreateEPGPFrameStandings()
 
   -- Populate the table
   CreateTable(tabl,
-              {"Name", "EP"},
+              {"Имя", "EP"},
               {0, 128},
               {"LEFT", "RIGHT"},
               27)  -- The scrollBarWidth

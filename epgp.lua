@@ -188,17 +188,27 @@ local function DecodeNote(note)
     if note == "" then
       return 0, 0
     else
-      local ep, gp = string.match(note, "^(%d+),(%d+)$")
+      local minus = false
+      if string.find(note,"-") then
+        minus = true
+      end
+      if minus then
+        local ep, gp = string.match(note, "^(%d+),(%d+)$")
+        if ep then
+          return -(tonumber(ep)), tonumber(gp)
+        end
+      else
+        local ep, gp = string.match(note, "(%d+),(%d+)$")
       if ep then
         return tonumber(ep), tonumber(gp)
+      end
       end
     end
   end
 end
 
 local function EncodeNote(ep, gp)
-  return string.format("%d,%d",
-                       math.max(ep, 0),
+  return string.format("%d,%d",ep,
                        math.max(gp - global_config.base_gp, 0))
 end
 
