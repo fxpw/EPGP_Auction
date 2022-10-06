@@ -212,9 +212,9 @@ local function AddEPGP(name, ep, gp)
   -- if (total_ep + ep) < 0 then
   --   ep = -total_ep
   -- end
-  -- if (total_gp + gp) < 0 then
-  --   gp = -total_gp
-  -- end
+  if (total_gp + gp) < 0 then
+    gp = -total_gp
+  end
 
   GS:SetNote(name, EncodeNote(total_ep + ep,
                               total_gp + gp + global_config.base_gp))
