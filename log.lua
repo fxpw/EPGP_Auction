@@ -45,7 +45,7 @@ local function GetTimestamp(diff)
   return time(timestamp_t)
 end
 
-local LOG_FORMAT = "LOG:%d\31%s\31%s\31%s\31%d"
+local LOG_FORMAT = "LOG:%d\31%s\31%s\31%s\31%d\31%s"
 
 local function AppendToLog(kind, event_type, name, reason, amount, mass, undo)
   -- print(event_type)
@@ -72,6 +72,7 @@ end
 function mod:LogSync(prefix, msg, distribution, sender)
   if prefix == "EPGP" and sender ~= UnitName("player") then
     local timestamp, kind, name, reason, amount, diff = deformat(msg, LOG_FORMAT)
+    -- print(diff)
     if timestamp then
       local entry = {tonumber(timestamp), kind, name, reason, tonumber(amount), diff or 0}
       table.insert(mod.db.profile.log, entry)
@@ -82,11 +83,13 @@ end
 
 local function LogRecordToString(record)
   local timestamp, kind, name, reason, amount, diff = unpack(record)
+  print(unpack(record))
+  diff = diff or "0"
 
   if kind == "EP" then
-    return string.format("%s: %+d EP (%s) для %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason, (diff and name.." ("..diff..")") or name)
+    return string.format("%s: %+d EP (%s) для %s %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason,name, diff)
   elseif kind == "GP" then
-    return string.format("%s: %+d GP (%s) для %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason, (diff and name.." ("..diff..")") or name)
+    return string.format("%s: %+d GP (%s) для %s %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason,name, diff)
   elseif kind == "BI" then
     return string.format("%s: %s для %s", date("%Y-%m-%d %H:%M", timestamp), reason, name)
   else
