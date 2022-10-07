@@ -564,16 +564,7 @@ local function CreateEPGPLogFrame()
     FauxScrollFrame_Update(
       scrollBar, numRecords, numDisplayedRecords, recordHeight)
   end
---
---
---
---
---
---
---
---
---
---
+
   EPGPLogFrame:SetScript("OnShow", LogChanged)
   EPGPLogFrame:SetScript("OnSizeChanged", LogChanged)
   scrollBar:SetScript(
@@ -964,202 +955,202 @@ local function AddEPControls(frame, withRecurring)
     end)
 end
 
-local function AddEPControls2(frame, withRecurring)
-  local reasonLabel =
-    frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-  reasonLabel:SetText("Причина GP")
-  reasonLabel:SetPoint("TOPLEFT")
+-- local function AddEPControls2(frame, withRecurring)
+--   local reasonLabel =
+--     frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+--   reasonLabel:SetText("Причина GP")
+--   reasonLabel:SetPoint("TOPLEFT")
 
-  local dropDown = CreateFrame("Frame", "$parentEPControlDropDown",
-                               frame, "UIDropDownMenuTemplate")
-  dropDown:EnableMouse(true)
-  UIDropDownMenu_Initialize(dropDown, EPGPSideFrameEPDropDown_Initialize)
-  UIDropDownMenu_SetWidth(dropDown, 150)
-  UIDropDownMenu_JustifyText(dropDown, "LEFT")
-  dropDown:SetPoint("TOPLEFT", reasonLabel, "BOTTOMLEFT")
+--   local dropDown = CreateFrame("Frame", "$parentEPControlDropDown",
+--                                frame, "UIDropDownMenuTemplate")
+--   dropDown:EnableMouse(true)
+--   UIDropDownMenu_Initialize(dropDown, EPGPSideFrameEPDropDown_Initialize)
+--   UIDropDownMenu_SetWidth(dropDown, 150)
+--   UIDropDownMenu_JustifyText(dropDown, "LEFT")
+--   dropDown:SetPoint("TOPLEFT", reasonLabel, "BOTTOMLEFT")
 
-  local otherLabel =
-    frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-  otherLabel:SetText(L["Other"])
-  otherLabel:SetPoint("LEFT", reasonLabel)
-  otherLabel:SetPoint("TOP", dropDown, "BOTTOM")
+--   local otherLabel =
+--     frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+--   otherLabel:SetText(L["Other"])
+--   otherLabel:SetPoint("LEFT", reasonLabel)
+--   otherLabel:SetPoint("TOP", dropDown, "BOTTOM")
 
-  local otherEditBox = CreateFrame("EditBox", "$parentEPControlOtherEditBox",
-                                   frame, "InputBoxTemplate")
-  otherEditBox:SetFontObject("GameFontHighlightSmall")
-  otherEditBox:SetHeight(24)
-  otherEditBox:SetAutoFocus(false)
-  otherEditBox:SetPoint("LEFT", frame, "LEFT", 25, 0)
-  otherEditBox:SetPoint("RIGHT", frame, "RIGHT", -15, 0)
-  otherEditBox:SetPoint("TOP", otherLabel, "BOTTOM")
-  otherEditBox:SetScript(
-    "OnTextChanged",
-    function(self)
-      local last_award =
-        EPGP.db.profile.last_awards[self:GetText()]
-      if last_award then
-        frame.editBox:SetText(last_award)
-      end
-    end)
+--   local otherEditBox = CreateFrame("EditBox", "$parentEPControlOtherEditBox",
+--                                    frame, "InputBoxTemplate")
+--   otherEditBox:SetFontObject("GameFontHighlightSmall")
+--   otherEditBox:SetHeight(24)
+--   otherEditBox:SetAutoFocus(false)
+--   otherEditBox:SetPoint("LEFT", frame, "LEFT", 25, 0)
+--   otherEditBox:SetPoint("RIGHT", frame, "RIGHT", -15, 0)
+--   otherEditBox:SetPoint("TOP", otherLabel, "BOTTOM")
+--   otherEditBox:SetScript(
+--     "OnTextChanged",
+--     function(self)
+--       local last_award =
+--         EPGP.db.profile.last_awards[self:GetText()]
+--       if last_award then
+--         frame.editBox:SetText(last_award)
+--       end
+--     end)
 
-  local label = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-  label:SetText(L["Value"])
-  label:SetPoint("LEFT", reasonLabel)
-  label:SetPoint("TOP", otherEditBox, "BOTTOM")
+--   local label = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+--   label:SetText(L["Value"])
+--   label:SetPoint("LEFT", reasonLabel)
+--   label:SetPoint("TOP", otherEditBox, "BOTTOM")
 
-  local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-  button:SetNormalFontObject("GameFontNormalSmall")
-  button:SetHighlightFontObject("GameFontHighlightSmall")
-  button:SetDisabledFontObject("GameFontDisableSmall")
-  button:SetHeight(BUTTON_HEIGHT)
-  button:SetText("Начислить GP")
-  button:SetWidth(button:GetTextWidth() + BUTTON_TEXT_PADDING)
-  button:SetPoint("RIGHT", otherEditBox, "RIGHT")
-  button:SetPoint("TOP", label, "BOTTOM")
+--   local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+--   button:SetNormalFontObject("GameFontNormalSmall")
+--   button:SetHighlightFontObject("GameFontHighlightSmall")
+--   button:SetDisabledFontObject("GameFontDisableSmall")
+--   button:SetHeight(BUTTON_HEIGHT)
+--   button:SetText("Начислить GP")
+--   button:SetWidth(button:GetTextWidth() + BUTTON_TEXT_PADDING)
+--   button:SetPoint("RIGHT", otherEditBox, "RIGHT")
+--   button:SetPoint("TOP", label, "BOTTOM")
 
-  local editBox = CreateFrame("EditBox", "$parentEPControlEditBox",
-                              frame, "InputBoxTemplate")
-  editBox:SetFontObject("GameFontHighlightSmall")
-  editBox:SetHeight(24)
-  editBox:SetAutoFocus(false)
-  editBox:SetPoint("LEFT", frame, "LEFT", 25, 0)
-  editBox:SetPoint("RIGHT", button, "LEFT")
-  editBox:SetPoint("TOP", label, "BOTTOM")
+--   local editBox = CreateFrame("EditBox", "$parentEPControlEditBox",
+--                               frame, "InputBoxTemplate")
+--   editBox:SetFontObject("GameFontHighlightSmall")
+--   editBox:SetHeight(24)
+--   editBox:SetAutoFocus(false)
+--   editBox:SetPoint("LEFT", frame, "LEFT", 25, 0)
+--   editBox:SetPoint("RIGHT", button, "LEFT")
+--   editBox:SetPoint("TOP", label, "BOTTOM")
 
-  local function EnabledStatus(self)
-    local reason = UIDropDownMenu_GetText(dropDown)
-    if reason == L["Other"] then
-      reason = otherEditBox:GetText()
-    end
-    local amount = editBox:GetNumber()
-    if EPGP:CanIncGPBy(reason, amount) then
-      self:Enable()
-    else
-      self:Disable()
-    end
-  end
-  button:SetScript("OnUpdate", EnabledStatus)
+--   local function EnabledStatus(self)
+--     local reason = UIDropDownMenu_GetText(dropDown)
+--     if reason == L["Other"] then
+--       reason = otherEditBox:GetText()
+--     end
+--     local amount = editBox:GetNumber()
+--     if EPGP:CanIncGPBy(reason, amount) then
+--       self:Enable()
+--     else
+--       self:Disable()
+--     end
+--   end
+--   button:SetScript("OnUpdate", EnabledStatus)
 
-  if withRecurring then
-    local recurring =
-      CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
-    recurring:SetWidth(20)
-    recurring:SetHeight(20)
-    recurring:SetPoint("TOP", editBox, "BOTTOMLEFT")
-    recurring:SetPoint("LEFT", reasonLabel)
-    recurring:SetScript(
-      "OnUpdate",
-      function (self)
-        if EPGP:RunningRecurringGP() then
-          self:Enable()
-        else
-          EnabledStatus(self)
-        end
-      end)
+--   if withRecurring then
+--     local recurring =
+--       CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+--     recurring:SetWidth(20)
+--     recurring:SetHeight(20)
+--     recurring:SetPoint("TOP", editBox, "BOTTOMLEFT")
+--     recurring:SetPoint("LEFT", reasonLabel)
+--     recurring:SetScript(
+--       "OnUpdate",
+--       function (self)
+--         if EPGP:RunningRecurringGP() then
+--           self:Enable()
+--         else
+--           EnabledStatus(self)
+--         end
+--       end)
 
-    local label =
-      frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    label:SetText(L["Recurring"])
-    label:SetPoint("LEFT", recurring, "RIGHT")
+--     local label =
+--       frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+--     label:SetText(L["Recurring"])
+--     label:SetPoint("LEFT", recurring, "RIGHT")
 
-    local timePeriod =
-      frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    timePeriod:SetJustifyH("RIGHT")
+--     local timePeriod =
+--       frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+--     timePeriod:SetJustifyH("RIGHT")
 
-    local incButton = CreateFrame("Button", nil, frame)
-    incButton:SetNormalTexture(
-      "Interface\\MainMenuBar\\UI-MainMenu-ScrollUpButton-Up")
-    incButton:SetPushedTexture(
-      "Interface\\MainMenuBar\\UI-MainMenu-ScrollUpButton-Down")
-    incButton:SetDisabledTexture(
-      "Interface\\MainMenuBar\\UI-MainMenu-ScrollUpButton-Disabled")
-    incButton:SetWidth(24)
-    incButton:SetHeight(24)
+--     local incButton = CreateFrame("Button", nil, frame)
+--     incButton:SetNormalTexture(
+--       "Interface\\MainMenuBar\\UI-MainMenu-ScrollUpButton-Up")
+--     incButton:SetPushedTexture(
+--       "Interface\\MainMenuBar\\UI-MainMenu-ScrollUpButton-Down")
+--     incButton:SetDisabledTexture(
+--       "Interface\\MainMenuBar\\UI-MainMenu-ScrollUpButton-Disabled")
+--     incButton:SetWidth(24)
+--     incButton:SetHeight(24)
 
-    local decButton = CreateFrame("Button", nil, frame)
-    decButton:SetNormalTexture(
-      "Interface\\MainMenuBar\\UI-MainMenu-ScrollDownButton-Up")
-    decButton:SetPushedTexture(
-      "Interface\\MainMenuBar\\UI-MainMenu-ScrollDownButton-Down")
-    decButton:SetDisabledTexture(
-      "Interface\\MainMenuBar\\UI-MainMenu-ScrollDownButton-Disabled")
-    decButton:SetWidth(24)
-    decButton:SetHeight(24)
+--     local decButton = CreateFrame("Button", nil, frame)
+--     decButton:SetNormalTexture(
+--       "Interface\\MainMenuBar\\UI-MainMenu-ScrollDownButton-Up")
+--     decButton:SetPushedTexture(
+--       "Interface\\MainMenuBar\\UI-MainMenu-ScrollDownButton-Down")
+--     decButton:SetDisabledTexture(
+--       "Interface\\MainMenuBar\\UI-MainMenu-ScrollDownButton-Disabled")
+--     decButton:SetWidth(24)
+--     decButton:SetHeight(24)
 
-    decButton:SetPoint("RIGHT", -15, 0)
-    decButton:SetPoint("TOP", recurring, "TOP")
-    incButton:SetPoint("RIGHT", decButton, "LEFT", 8, 0)
-    timePeriod:SetPoint("RIGHT", incButton, "LEFT")
+--     decButton:SetPoint("RIGHT", -15, 0)
+--     decButton:SetPoint("TOP", recurring, "TOP")
+--     incButton:SetPoint("RIGHT", decButton, "LEFT", 8, 0)
+--     timePeriod:SetPoint("RIGHT", incButton, "LEFT")
 
-    function frame:UpdateTimeControls()
-      local period_mins = EPGP:RecurringEPPeriodMinutes()
-      local fmt, val = SecondsToTimeAbbrev(period_mins * 60)
-      timePeriod:SetText(fmt:format(val))
-      recurring:SetChecked(EPGP:RunningRecurringEP())
-      if period_mins == 1 or EPGP:RunningRecurringEP() then
-        decButton:Disable()
-      else
-        decButton:Enable()
-      end
-      if EPGP:RunningRecurringEP() then
-        incButton:Disable()
-      else
-        incButton:Enable()
-      end
-    end
+--     function frame:UpdateTimeControls()
+--       local period_mins = EPGP:RecurringEPPeriodMinutes()
+--       local fmt, val = SecondsToTimeAbbrev(period_mins * 60)
+--       timePeriod:SetText(fmt:format(val))
+--       recurring:SetChecked(EPGP:RunningRecurringEP())
+--       if period_mins == 1 or EPGP:RunningRecurringEP() then
+--         decButton:Disable()
+--       else
+--         decButton:Enable()
+--       end
+--       if EPGP:RunningRecurringEP() then
+--         incButton:Disable()
+--       else
+--         incButton:Enable()
+--       end
+--     end
 
-    incButton:SetScript(
-      "OnClick",
-      function(self)
-        local period_mins = EPGP:RecurringEPPeriodMinutes()
-        EPGP:RecurringEPPeriodMinutes(period_mins + 1)
-        self:GetParent():UpdateTimeControls()
-      end)
+--     incButton:SetScript(
+--       "OnClick",
+--       function(self)
+--         local period_mins = EPGP:RecurringEPPeriodMinutes()
+--         EPGP:RecurringEPPeriodMinutes(period_mins + 1)
+--         self:GetParent():UpdateTimeControls()
+--       end)
 
-    decButton:SetScript(
-      "OnClick",
-      function(self)
-        local period_mins = EPGP:RecurringEPPeriodMinutes()
-        EPGP:RecurringEPPeriodMinutes(period_mins - 1)
-        self:GetParent():UpdateTimeControls()
-      end)
+--     decButton:SetScript(
+--       "OnClick",
+--       function(self)
+--         local period_mins = EPGP:RecurringEPPeriodMinutes()
+--         EPGP:RecurringEPPeriodMinutes(period_mins - 1)
+--         self:GetParent():UpdateTimeControls()
+--       end)
 
-    frame.recurring = recurring
-    frame.incButton = incButton
-    frame.decButton = decButton
-  end
+--     frame.recurring = recurring
+--     frame.incButton = incButton
+--     frame.decButton = decButton
+--   end
 
-  frame:SetHeight(
-    reasonLabel:GetHeight() +
-    dropDown:GetHeight() +
-    otherLabel:GetHeight() +
-    otherEditBox:GetHeight() +
-    label:GetHeight() +
-    button:GetHeight() +
-    (withRecurring and frame.recurring:GetHeight() or 0))
+--   frame:SetHeight(
+--     reasonLabel:GetHeight() +
+--     dropDown:GetHeight() +
+--     otherLabel:GetHeight() +
+--     otherEditBox:GetHeight() +
+--     label:GetHeight() +
+--     button:GetHeight() +
+--     (withRecurring and frame.recurring:GetHeight() or 0))
 
-  frame.reasonLabel = reasonLabel
-  frame.dropDown = dropDown
-  frame.otherLabel = otherLabel
-  frame.otherEditBox = otherEditBox
-  frame.label = label
-  frame.editBox = editBox
-  frame.button = button
+--   frame.reasonLabel = reasonLabel
+--   frame.dropDown = dropDown
+--   frame.otherLabel = otherLabel
+--   frame.otherEditBox = otherEditBox
+--   frame.label = label
+--   frame.editBox = editBox
+--   frame.button = button
 
-  frame:SetScript(
-    "OnShow",
-    function(self)
-      self.editBox:SetText("")
-      UIDropDownMenu_ClearAll(self.dropDown)
-      self.otherLabel:SetAlpha(0.25)
-      self.otherEditBox:SetAlpha(0.25)
-      self.otherEditBox:EnableKeyboard(false)
-      self.otherEditBox:EnableMouse(false)
-      if self.UpdateTimeControls then
-        self:UpdateTimeControls()
-      end
-    end)
-end
+--   frame:SetScript(
+--     "OnShow",
+--     function(self)
+--       self.editBox:SetText("")
+--       UIDropDownMenu_ClearAll(self.dropDown)
+--       self.otherLabel:SetAlpha(0.25)
+--       self.otherEditBox:SetAlpha(0.25)
+--       self.otherEditBox:EnableKeyboard(false)
+--       self.otherEditBox:EnableMouse(false)
+--       if self.UpdateTimeControls then
+--         self:UpdateTimeControls()
+--       end
+--     end)
+-- end
 
 local function CreateEPGPSideFrame(self)
   local f = CreateFrame("Frame", "EPGPSideFrame", EPGPFrame)
@@ -1646,10 +1637,12 @@ local function CreateEPGPFrameStandings()
       local j = i + offset
       if j <= numMembers then
         row.name = EPGP:GetMember(j)
+        -- print(row.name)
         row.cells[1]:SetText(row.name)
         local c = RAID_CLASS_COLORS[EPGP:GetClass(row.name)]
         row.cells[1]:SetTextColor(c.r, c.g, c.b)
         local ep, gp = EPGP:GetEPGP(row.name)
+        -- print(ep)
         row.cells[2]:SetText(ep)
         -- row.cells[3]:SetText(gp)
         -- local pr = 0

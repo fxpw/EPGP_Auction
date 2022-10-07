@@ -55,6 +55,8 @@ local function AppendToLog(kind, event_type, name, reason, amount, mass, undo)
       mod.db.profile.redo[k] = nil
     end
 	local curEP = EPGP:GetEPGP(name)
+    -- print(curEP,58)
+    curEP = curEP + amount
     -- local logChange = 0
     -- if event_type == "GPAward" then
     --   logChange = curGP+amount
@@ -83,13 +85,13 @@ end
 
 local function LogRecordToString(record)
   local timestamp, kind, name, reason, amount, diff = unpack(record)
-  -- print(unpack(record))
+  print(unpack(record))
   diff = diff or "0"
 
   if kind == "EP" then
-    return string.format("%s: %+d EP (%s) для %s %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason,name, diff)
+    return string.format("%s: %+d EP (%s) для %s стало %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason,name, diff)
   elseif kind == "GP" then
-    return string.format("%s: %+d GP (%s) для %s %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason,name, diff)
+    return string.format("%s: %+d GP (%s) для %s стало %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason,name, diff)
   elseif kind == "BI" then
     return string.format("%s: %s для %s", date("%Y-%m-%d %H:%M", timestamp), reason, name)
   else

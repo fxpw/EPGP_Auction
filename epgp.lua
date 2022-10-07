@@ -135,7 +135,7 @@
 --
 
 local Debug = LibStub("LibDebug-1.0")
-Debug:EnableDebugging()
+Debug:EnableDebugging(true)
 local L = LibStub("AceLocale-3.0"):GetLocale("EPGP")
 local GS = LibStub("LibGuildStorage-1.0")
 
@@ -208,12 +208,12 @@ local function DecodeNote(note)
 end
 
 local function EncodeNote(ep, gp)
-  return string.format("%d,%d",ep,
-                       math.max(gp - global_config.base_gp, 0))
+  return string.format("%d,%d",ep, math.max(gp - global_config.base_gp, 0))
 end
 
 local function AddEPGP(name, ep, gp)
   local total_ep = ep_data[name]
+
   local total_gp = gp_data[name]
   assert(total_ep ~= nil and total_gp ~=nil,
          string.format("%s is not a main!", tostring(name)))
@@ -225,9 +225,8 @@ local function AddEPGP(name, ep, gp)
   if (total_gp + gp) < 0 then
     gp = -total_gp
   end
-
-  GS:SetNote(name, EncodeNote(total_ep + ep,
-                              total_gp + gp + global_config.base_gp))
+  -- print(total_ep + ep)
+  GS:SetNote(name, EncodeNote(total_ep + ep, total_gp + gp + global_config.base_gp))
   return ep, gp
 end
 
@@ -346,7 +345,7 @@ local global_config_defs = {
   min_ep = {
     pattern = "@MIN_EP:(%d+)",
     parser = tonumber,
-    validator = function(v) return v >= 0 end,
+    validator = function(v) return true end,
     error = L["Min EP should be a positive number"],
     default = 0,
     change_message = "MinEPChanged",
@@ -649,9 +648,10 @@ end
 
 function EPGP:GetEPGP(name)
   local main = main_data[name]
-  if main then
-    name = main
-  end
+  -- if main then
+  --   name = main
+  -- end
+  -- print(ep_data[name])
   if ep_data[name] then
     return ep_data[name], gp_data[name] + global_config.base_gp, main
   end
@@ -674,7 +674,7 @@ function EPGP:CanIncEPBy(reason, amount)
     -- print(664)
     return false
   end
-  if amount < -99999 or amount > 99999 or amount == 0 then
+  if amount < -999999 or amount > 999999 or amount == 0 then
     -- print(668)
     return false
   end
@@ -876,7 +876,7 @@ function EPGP:OnInitialize()
     profile = {
       last_awards = {},
       show_everyone = false,
-      sort_order = "PR",
+      sort_order = "EP",
       recurring_ep_period_mins = 15,
     }
   }
