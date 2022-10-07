@@ -192,17 +192,21 @@ local function DecodeNote(note)
       if string.find(note,"-") then
         minus = true
       end
-      if minus then
-        local ep, gp = string.match(note, "^(%d+),(%d+)$")
-        if ep then
-          return -(tonumber(ep)), tonumber(gp)
-        end
-      else
-        local ep, gp = string.match(note, "(%d+),(%d+)$")
+      -- if minus then
+      local ep, gp = string.match(note, "(%d+),(%d+)$")
       if ep then
-        return tonumber(ep), tonumber(gp)
+        ep = tonumber(ep)
+        gp = tonumber(gp)
+        if minus then
+          ep = -ep
+        end
+        return ep, gp
       end
-      end
+      -- else
+        -- local ep, gp = string.match(note, "(%d+),(%d+)$")
+      -- if ep then
+      --   return tonumber(ep), tonumber(gp)
+      -- end
     end
   end
 end
@@ -434,6 +438,7 @@ local function ParseGuildNote(callback, name, note)
   DeleteState(name)
 
   local ep, gp = DecodeNote(note)
+    print(ep, gp, note)
   if ep then
     ep_data[name] = ep
     gp_data[name] = gp
@@ -449,8 +454,8 @@ local function ParseGuildNote(callback, name, note)
         alt_data[note] = {}
       end
       table.insert(alt_data[note], name)
-      ep_data[name] = nil
-      gp_data[name] = nil
+      -- ep_data[name] = nil
+      -- gp_data[name] = nil
     end
   end
   DestroyStandings()
@@ -652,9 +657,9 @@ function EPGP:GetEPGP(name)
   --   name = main
   -- end
   -- print(ep_data[name])
-  if ep_data[name] then
-    return ep_data[name], gp_data[name] + global_config.base_gp, main
-  end
+  -- if ep_data[name] then
+    return ep_data[name], 1, main
+  -- end
 end
 
 function EPGP:GetClass(name)
@@ -688,6 +693,7 @@ function EPGP:IncEPBy(name, reason, amount, mass, undo)
   assert(type(name) == "string")
 
   local ep, gp, main = self:GetEPGP(name)
+  print(ep, gp, main)
   if not ep then
     self:Print(L["Ignoring EP change for unknown member %s"]:format(name))
     return
