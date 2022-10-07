@@ -438,7 +438,7 @@ local function ParseGuildNote(callback, name, note)
   DeleteState(name)
 
   local ep, gp = DecodeNote(note)
-    print(ep, gp, note)
+    -- print(ep, gp, note)
   if ep then
     ep_data[name] = ep
     gp_data[name] = gp
@@ -693,7 +693,7 @@ function EPGP:IncEPBy(name, reason, amount, mass, undo)
   assert(type(name) == "string")
 
   local ep, gp, main = self:GetEPGP(name)
-  print(ep, gp, main)
+  -- print(ep, gp, main)
   if not ep then
     self:Print(L["Ignoring EP change for unknown member %s"]:format(name))
     return
