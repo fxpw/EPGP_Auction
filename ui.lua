@@ -1158,7 +1158,7 @@ local function CreateEPGPSideFrame(self)
 
   f:Hide()
   f:SetWidth(225)
-  f:SetHeight(255)
+  f:SetHeight(180)
   f:SetPoint("TOPLEFT", EPGPFrame, "TOPRIGHT", -33, -20)
 
   local h = f:CreateTexture(nil, "ARTWORK")
@@ -1189,21 +1189,21 @@ local function CreateEPGPSideFrame(self)
   local cb = CreateFrame("Button", nil, f, "UIPanelCloseButton")
   cb:SetPoint("TOPRIGHT", f, "TOPRIGHT", -2, -3)
 
-  local gpFrame = CreateFrame("Frame", nil, f)
-  gpFrame:SetPoint("TOPLEFT", f, "TOPLEFT", 15, -30)
-  gpFrame:SetPoint("TOPRIGHT", f, "TOPRIGHT", -15, -30)
-  AddGPControls(gpFrame)
-  gpFrame.button:SetScript(
-    "OnClick",
-    function(self)
-      EPGP:IncGPBy(f.name,
-                   UIDropDownMenu_GetText(gpFrame.dropDown),
-                   gpFrame.editBox:GetNumber())
-    end)
+  -- local gpFrame = CreateFrame("Frame", nil, f)
+  -- gpFrame:SetPoint("TOPLEFT", f, "TOPLEFT", 15, -30)
+  -- gpFrame:SetPoint("TOPRIGHT", f, "TOPRIGHT", -15, -30)
+  -- AddGPControls(gpFrame)
+  -- gpFrame.button:SetScript(
+  --   "OnClick",
+  --   function(self)
+  --     EPGP:IncGPBy(f.name,
+  --                  UIDropDownMenu_GetText(gpFrame.dropDown),
+  --                  gpFrame.editBox:GetNumber())
+  --   end)
 
   local epFrame = CreateFrame("Frame", nil, f)
-  epFrame:SetPoint("TOPLEFT", gpFrame, "BOTTOMLEFT", 0, -15)
-  epFrame:SetPoint("TOPRIGHT", gpFrame, "BOTTOMRIGHT", 0, -15)
+  epFrame:SetPoint("TOPLEFT", f, "TOPLEFT", 15, -30)
+  epFrame:SetPoint("TOPRIGHT", f, "TOPRIGHT", -15, -30)
   AddEPControls(epFrame)
   epFrame.button:SetScript(
     "OnClick",
