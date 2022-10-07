@@ -85,7 +85,7 @@ end
 
 local function LogRecordToString(record)
   local timestamp, kind, name, reason, amount, diff = unpack(record)
-  print(unpack(record))
+  -- print(unpack(record))
   diff = diff or "0"
 
   if kind == "EP" then
