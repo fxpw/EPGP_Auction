@@ -22,23 +22,23 @@ local function RestoreAnchors(t)
 end
 
 local blizzardPopupAnchors = {}
-
+ -- StaticPopup1:SetWidth(1000)
 StaticPopupDialogs["EPGP_CONFIRM_GP_CREDIT"] = {
   text = L["Credit GP to %s"],
   button1 = ACCEPT,
   button2 = CANCEL,
-  button3 = GUILD_BANK,
   timeout = 0,
   whileDead = 1,
   maxLetters = 16,
   hideOnEscape = 1,
   hasEditBox = 1,
   hasItemFrame = 1,
+  
 
   OnAccept = function(self)
                local link = self.itemFrame.link
                local gp = tonumber(self.editBox:GetText())
-               EPGP:IncGPBy(self.name, link, gp)
+               EPGP:IncEPBy(self.name, link, gp)
              end,
 
   OnAlt = function(self)
@@ -51,17 +51,20 @@ StaticPopupDialogs["EPGP_CONFIRM_GP_CREDIT"] = {
                SaveAnchors(blizzardPopupAnchors[self],
                            self.itemFrame, self.editBox, self.button1)
              end
-
-             self.itemFrame:SetPoint("TOPLEFT", 85, -35)
-             self.editBox:SetPoint(
-               "TOPLEFT", self.itemFrame, "TOPRIGHT", 150, -10)
-             self.editBox:SetPoint("RIGHT", -85, 0)
-             self.button1:SetPoint(
-               "TOPRIGHT", self.itemFrame, "BOTTOMRIGHT", 35, -6)
+-- self.StaticPopup1:SetWidth(1000)
+             self.itemFrame:SetPoint("LEFT", 10, 0)
+			 -- self.itemFrame:SetHeight(40)
+			 -- self.itemFrame:SetWidth(40)
+             -- self.editBox:SetPoint(
+               -- "CENTER", self.itemFrame, "TOP", 0 , 0)  
+             self.editBox:SetPoint("RIGHT", -10, 0)
+			  -- self.editBox:SetPoint("TOPRIGHT", 0, 0)
+             -- self.button1:SetPoint(
+               -- "TOPRIGHT", self.itemFrame, "BOTTOMRIGHT", 0, 0)
 
              local gp1, gp2 = GP:GetValue(self.itemFrame.link)
              if not gp1 then
-               self.editBox:SetText("")
+               self.editBox:SetText("-200")
              elseif not gp2 then
                self.editBox:SetText(tostring(gp1))
              else
@@ -87,7 +90,7 @@ StaticPopupDialogs["EPGP_CONFIRM_GP_CREDIT"] = {
   OnUpdate = function(self, elapsed)
                local link = self.itemFrame.link
                local gp = tonumber(self.editBox:GetText())
-               if EPGP:CanIncGPBy(link, gp) then
+               if EPGP:CanIncEPBy(link, gp) then
                  self.button1:Enable()
                else
                  self.button1:Disable()
