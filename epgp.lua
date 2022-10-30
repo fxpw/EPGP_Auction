@@ -261,8 +261,15 @@ local comparators = {
   EP = function(a, b)
          local a_ep, a_gp = EPGP:GetEPGP(a)
          local b_ep, b_gp = EPGP:GetEPGP(b)
-
-         return a_ep > b_ep
+          -- if a_ep and b_ep then
+            a_ep = a_ep or 0
+            b_ep = b_ep or 0
+          return a_ep > b_ep
+          -- elseif a_ep then
+            -- return true
+          -- else
+            -- return false
+          -- end
        end,
   GP = function(a, b)
          local a_ep, a_gp = EPGP:GetEPGP(a)
@@ -653,9 +660,9 @@ end
 
 function EPGP:GetEPGP(name)
   local main = main_data[name]
-  -- if main then
-  --   name = main
-  -- end
+  if main then
+    name = main
+  end
   -- print(ep_data[name])
   -- if ep_data[name] then
     return ep_data[name], 1, main

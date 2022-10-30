@@ -1664,6 +1664,7 @@ local function CreateEPGPFrameStandings()
             row.check:Show()
           end
         end
+        ep = ep or 0
         row:SetAlpha(ep < minEP and 0.6 or 1)
         row:Show()
       else
