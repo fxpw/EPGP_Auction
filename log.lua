@@ -30,25 +30,19 @@ local callbacks = mod.callbacks
 
 local timestamp_t = {}
 local function GetTimestamp(diff)
-  timestamp_t.month = select(2, CalendarGetDate())
-  timestamp_t.day = select(3, CalendarGetDate())
-  timestamp_t.year = select(4, CalendarGetDate())
-  timestamp_t.hour = select(1, GetGameTime())
-  timestamp_t.min = select(2, GetGameTime())
-  if diff then
-    timestamp_t.month = timestamp_t.month + (diff.month or 0)
-    timestamp_t.day = timestamp_t.day + (diff.day or 0)
-    timestamp_t.year = timestamp_t.year + (diff.year or 0)
-    timestamp_t.hour = timestamp_t.hour + (diff.hour or 0)
-    timestamp_t.min = timestamp_t.min + (diff.min or 0)
-  end
-  return time(timestamp_t)
+  return time()
 end
-
-local LOG_FORMAT = "LOG:%d\31%s\31%s\31%s\31%d\31%s"
+local function CheckFilter(log, str)
+  return string.find(string.lower(log[3]), string.lower(str))
+end
+local LOG_FORMAT = "LOG:%d\31%s\31%s\31%s\31%d\31%s\31%s"
+local function log(...)
+  print("EPGP_SYNC", ...)
+end
 
 local function AppendToLog(kind, event_type, name, reason, amount, mass, undo)
   -- print(event_type)
+
   if not undo then
     -- Clear the redo table
     for k,_ in ipairs(mod.db.profile.redo) do
@@ -64,8 +58,12 @@ local function AppendToLog(kind, event_type, name, reason, amount, mass, undo)
     --   logChange = curEP+amount
     -- end
     -- print(curEP, curGP,logChange)
-    local entry = {GetTimestamp(), kind, name, reason, amount, curEP}
+    local entry = {GetTimestamp(), kind, name, reason, amount, curEP, UnitName("player")}
     table.insert(mod.db.profile.log, entry)
+    exists_logs[string.format(LOG_FORMAT, unpack(entry))] = true
+    if CheckFilter(entry, mod.db.profile.filter) then
+      table.insert(mod.db.profile.filtred_logs, entry)
+    end
     mod:SendCommMessage("EPGP", string.format(LOG_FORMAT, unpack(entry)),"GUILD", nil, "BULK")
     callbacks:Fire("LogChanged", #mod.db.profile.log)
   end
@@ -73,41 +71,64 @@ end
 
 function mod:LogSync(prefix, msg, distribution, sender)
   if prefix == "EPGP" and sender ~= UnitName("player") then
-    local timestamp, kind, name, reason, amount, diff = deformat(msg, LOG_FORMAT)
+    local timestamp, kind, name, reason, amount, diff, who = deformat(msg, LOG_FORMAT)
     -- print(diff)
     if timestamp then
-      local entry = {tonumber(timestamp), kind, name, reason, tonumber(amount), diff or 0}
+      local entry = {tonumber(timestamp), kind, name, reason, tonumber(amount), diff or 0, who}
       table.insert(mod.db.profile.log, entry)
+      if CheckFilter(entry, mod.db.profile.filter) then
+        table.insert(mod.db.profile.filtred_logs, entry)
+      end
+      exists_logs[string.format(LOG_FORMAT, unpack(entry))] = true
       callbacks:Fire("LogChanged", #self.db.profile.log)
     end
   end
 end
 
 local function LogRecordToString(record)
-  local timestamp, kind, name, reason, amount, diff = unpack(record)
+  local timestamp, kind, name, reason, amount, diff, who = unpack(record)
   -- print(unpack(record))
   diff = diff or "0"
 
   if kind == "EP" then
-    return string.format("%s: %+d EP (%s) для %s стало %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason,name, diff)
+    return string.format("%s: %+d EP (%s) для %s стало %s начисление от %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason,name, diff, who)
   elseif kind == "GP" then
-    return string.format("%s: %+d GP (%s) для %s стало %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason,name, diff)
+    return string.format("%s: %+d GP (%s) для %s стало %s начисление от %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason,name, diff, who)
   elseif kind == "BI" then
     return string.format("%s: %s для %s", date("%Y-%m-%d %H:%M", timestamp), reason, name)
   else
     assert(false, "Unknown record in the log")
   end
 end
+function mod:SetFilter(search)
+  self.db.profile.filter = search
+  table.wipe(self.db.profile.filtred_logs)
+  for _, log in pairs(self.db.profile.log) do
+      if CheckFilter(log, search) then
+          table.insert(self.db.profile.filtred_logs, log)
+      end
+  end
+
+  callbacks:Fire("LogChanged", #self.db.profile.filtred_logs)
+end
 
 function mod:GetNumRecords()
-  return #self.db.profile.log
+  if self.db.profile.filter == "" then
+      return #self.db.profile.log
+  end
+  return #self.db.profile.filtred_logs
 end
 
 function mod:GetLogRecord(i)
-  local logsize = #self.db.profile.log
-  assert(i >= 0 and i < #self.db.profile.log, "Index "..i.." is out of bounds")
+  local logs = self.db.profile.filtred_logs
+  if self.db.profile.filter == "" then
+      logs = self.db.profile.log
+  end
 
-  return LogRecordToString(self.db.profile.log[logsize - i])
+  local logsize = #logs
+  assert(i >= 0 and i < logsize, "Index " .. i .. " is out of bounds")
+
+  return LogRecordToString(logs[logsize - i])
 end
 
 function mod:CanUndo()
@@ -116,11 +137,31 @@ function mod:CanUndo()
   end
   return #self.db.profile.log ~= 0
 end
+function mod:GetLastActionForUndo()
+  local skip_count = 0
+
+  for i = #self.db.profile.log, 1, -1 do
+      local log = self.db.profile.log[i]
+
+      local is_undo = string.starts(log[4], L["Undo"])
+      if not is_undo and skip_count == 0 then
+          return log
+      end
+
+      if is_undo then
+          skip_count = skip_count + 1
+      else
+          skip_count = skip_count - 1
+      end
+  end
+
+  return nil
+end
 
 function mod:UndoLastAction()
   assert(#self.db.profile.log ~= 0)
 
-  local record = table.remove(self.db.profile.log)
+  local record = mod:GetLastActionForUndo()
   table.insert(self.db.profile.redo, record)
 
   local timestamp, kind, name, reason, amount, diff = unpack(record)
@@ -152,18 +193,20 @@ end
 function mod:RedoLastUndo()
   assert(#self.db.profile.redo ~= 0)
 
-  local record = table.remove(self.db.profile.redo)
+  local record = next(self.db.profile.redo)
   local timestamp, kind, name, reason, amount, diff = unpack(record)
 
   local ep, gp, main = EPGP:GetEPGP(name)
   if kind == "EP" then
-    EPGP:IncEPBy(name, L["Redo"].." "..reason, amount, false, true)
-    table.insert(self.db.profile.log, record)
+      EPGP:IncEPBy(name, L["Redo"] .. " " .. reason, amount, false, true)
+      table.insert(self.db.profile.log, record)
+      exists_logs[string.format(LOG_FORMAT, unpack(record))] = true
   elseif kind == "GP" then
-    EPGP:IncGPBy(name, L["Redo"].." "..reason, amount, false, true)
-    table.insert(self.db.profile.log, record)
+      EPGP:IncGPBy(name, L["Redo"] .. " " .. reason, amount, false, true)
+      table.insert(self.db.profile.log, record)
+      exists_logs[string.format(LOG_FORMAT, unpack(record))] = true
   else
-    assert(false, "Unknown record in the log")
+      assert(false, "Unknown record in the log")
   end
 
   callbacks:Fire("LogChanged", #self.db.profile.log)
@@ -191,22 +234,25 @@ local function reverse(t)
     swap(t, i, #t - i + 1)
   end
 end
-
+string.starts = string.starts or function(str, start)
+  return string.sub(str, 1, string.len(start)) == start
+end
+local timeReuse = 60 * 60 * 24 * 30
 function mod:TrimToOneMonth()
   -- The log is sorted in reverse timestamp. We do not want to remove
   -- one item at a time since this will result in O(n^2) time. So we
   -- build it anew.
   local new_log = {}
-  local last_timestamp = GetTimestamp({ month = -1 })
+  local last_timestamp = GetTimestamp() - timeReuse
 
   -- Go through the log in reverse order and stop when we reach an
   -- entry older than one month.
-  for i=#self.db.profile.log,1,-1 do
-    local record = self.db.profile.log[i]
-    if record[1] < last_timestamp then
-      break
-    end
-    table.insert(new_log, record)
+  for i = #self.db.profile.log, 1, -1 do
+      local record = self.db.profile.log[i]
+      if record[1] < last_timestamp then
+          break
+      end
+      table.insert(new_log, record)
   end
 
   -- The new log is in reverse order now so reverse it.
@@ -320,6 +366,7 @@ function mod:Import(jsonStr)
     local record = table.remove(self.db.profile.redo)
     if record[1] < timestamp then
       table.insert(self.db.profile.log, record)
+      exists_logs[string.format(LOG_FORMAT, unpack(record))] = true
     end
   end
 
@@ -334,11 +381,141 @@ mod.dbDefaults = {
   }
 }
 
+local sync_logs = {}
+local sync_players_in_progress = {}
+local self_player_name = UnitName("player")
+exists_logs = {}
+function mod:EPGP_SYNC_REQUEST(tag, msg, channel, sender)
+    if channel ~= "GUILD" then
+        return
+    end
+
+    if sender == self_player_name then
+        return
+    end
+
+    local from_timestamp = tonumber(msg)
+    local logs = self.db.profile.log
+    local logs_for_sync = {}
+
+    for i = #logs, 1, -1 do
+        local log = logs[i]
+
+        if log[1] > from_timestamp then
+            table.insert(logs_for_sync, 1, log)
+        end
+    end
+
+    log("Получили запрос на синхронизацию логов от " .. sender .. ". Отправляем", #logs_for_sync, "логов")
+
+    for _, log in ipairs(logs_for_sync) do
+      print(string.format(LOG_FORMAT, unpack(log)))
+        mod:SendCommMessage("EPGP_SYNC_LOG", string.format(LOG_FORMAT, unpack(log)), "WHISPER", sender)
+    end
+
+    mod:SendCommMessage("EPGP_SYNC_LOG", "END:" .. tostring(#logs_for_sync), "WHISPER", sender)
+end
+
+function mod:EPGP_SYNC_LOG(tag, msg, channel, sender)
+    if channel ~= "WHISPER" then
+        return
+    end
+
+    if sender == self_player_name then
+        return
+    end
+
+    if not GS:GetRank(sender) then
+        log(sender, "не находится в гильдии, но предлагает синхронизовать его логи!? wtf")
+        return
+    end
+
+    if string.starts(msg, "END") then
+        return self:EPGP_SYNC_RESPONSE(tag, msg, channel, sender)
+    end
+
+    if exists_logs[msg] then
+        return
+    end
+
+    local members_with_logs = sync_logs[msg] or {}
+    local member_exists = false
+    for _, member in pairs(members_with_logs) do
+        if member == sender then
+            member_exists = true
+        end
+    end
+    if not member_exists then
+        table.insert(members_with_logs, sender)
+    end
+    sync_logs[msg] = members_with_logs
+
+    if #members_with_logs == 2 then
+        local timestamp, kind, name, reason, amount, diff, who = deformat(msg, LOG_FORMAT)
+        -- if not timestamp then
+        --     timestamp, kind, name, reason, amount = deformat(msg, LOG_FORMAT)
+        --     diff = "Unknown"
+        -- end
+
+        if timestamp then
+            local entry = { tonumber(timestamp), kind, name, reason, tonumber(amount), diff, who}
+            table.insert(mod.db.profile.log, entry)
+            exists_logs[msg] = true
+
+            if CheckFilter(entry, mod.db.profile.filter) then
+                table.insert(mod.db.profile.filtred_logs, entry)
+            end
+            callbacks:Fire("LogChanged", #self.db.profile.log)
+        end
+    end
+
+    if #members_with_logs >= 2 then
+        return
+    end
+
+    sync_players_in_progress[sender] = GetTime()
+end
+
+function mod:EPGP_SYNC_RESPONSE(tag, msg, channel, sender)
+    if channel ~= "WHISPER" then
+        return
+    end
+
+    if sender == self_player_name then
+        return
+    end
+
+    if not GS:GetRank(sender) then
+        log(sender, "не находится в гильдии, но предлагает синхронизовать его логи!? wtf")
+        return
+    end
+
+    local splitted = { string.split(':', msg) }
+    local msg = splitted[2]
+    log("Логи от " .. sender .. " прошли синхронизацию успешно, Синхронизированно:", msg)
+
+    local cur_time = GetTime()
+    sync_players_in_progress[sender] = nil
+    for name, time in pairs(sync_players_in_progress) do
+        if cur_time - time < 10 then
+            return
+        end
+    end
+
+    table.sort(self.db.profile.log, function (a, b)
+        return a[1] < b[1]
+    end)
+
+    log("Синхранизация логов завершена")
+end
+local calcLatestTime = 60 * 60 * 24 * 7
 function mod:OnEnable()
   EPGP.RegisterCallback(mod, "EPAward", AppendToLog, "EP")
   EPGP.RegisterCallback(mod, "GPAward", AppendToLog, "GP")
   EPGP.RegisterCallback(mod, "BankedItem", AppendToLog, "BI")
   mod:RegisterComm("EPGP", "LogSync")
+  mod:RegisterComm("EPGP_SYNC_REQUEST", "EPGP_SYNC_REQUEST")
+  mod:RegisterComm("EPGP_SYNC_LOG", "EPGP_SYNC_LOG")
 
   -- Upgrade the logs from older dbs
   if EPGP.db.profile.log then
@@ -349,7 +526,26 @@ function mod:OnEnable()
     self.db.profile.redo = EPGP.db.profile.redo
     EPGP.db.profile.redo = nil
   end
+  self.db.profile.filter = ""
+  self.db.profile.filtred_logs = {}
 
+  table.sort(self.db.profile.log, function (a, b)
+      return a[1] < b[1]
+  end)
+
+  local latest_time = GetTimestamp() - calcLatestTime
+  local logs = self.db.profile.log
+  if logs and #logs > 0 then
+      local latest_log = logs[#logs]
+      latest_time = latest_log[1]
+  end
+  mod:SendCommMessage("EPGP_SYNC_REQUEST", tostring(latest_time), "GUILD", "BULK")
+  log("Запросили логи начиная с", tostring(latest_time))
+
+  for _, log in pairs(logs) do
+      log[6] = log[6] or "Unknown"
+      exists_logs[string.format(LOG_FORMAT, unpack(log))] = true
+  end
   -- This is kept for historical reasons. See:
   -- http://code.google.com/p/epgp/issues/detail?id=350.
   EPGP.db.RegisterCallback(self, "OnDatabaseShutdown", "Snapshot")

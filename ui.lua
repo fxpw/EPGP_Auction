@@ -322,16 +322,29 @@ local function CreateTable(parent, texts, widths, justfiesH, rightPadding)
   end
 end
 
+local function search_btn(search_text)
+  EPGP:GetModule("log"):SetFilter(search_text)
+end
+
+local OnEnterPressed = function(this)
+  search_btn(EPGPSearchEditBox:GetText())
+  this:ClearFocus();
+end
+
+local OnEscapePressed = function(this)
+  this:ClearFocus();
+end
+
 local function CreateEPGPLogFrame()
   local f = CreateFrame("Frame", "EPGPLogFrame", EPGPFrame)
   table.insert(SIDEFRAMES, f)
 
   f:SetResizable(true)
-  f:SetMinResize(540, 435)
+  f:SetMinResize(600, 435)
   f:SetMaxResize(1200, 435)
 
   f:Hide()
-  f:SetWidth(540)
+  f:SetWidth(600)
   f:SetHeight(435)
   f:SetPoint("TOPLEFT", EPGPFrame, "TOPRIGHT", -37, -6)
 
@@ -341,10 +354,31 @@ local function CreateEPGPLogFrame()
   t:SetHeight(32)
   t:SetPoint("TOPRIGHT", f, "TOPRIGHT", -6, -7)
 
-  t = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-  t:SetPoint("TOPLEFT", f, "TOPLEFT", 17, -17)
-  t:SetText(L["Personal Action Log"])
+  -- t = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+  -- t:SetPoint("TOPLEFT", f, "TOPLEFT", 17, -17)
+  -- t:SetText(L["Personal Action Log"])
 
+  local search_input = CreateFrame("EditBox", "EPGPSearchEditBox", f, "InputBoxTemplate")
+  search_input:SetPoint("TOPLEFT", f, "TOPLEFT", 23, 0)
+  search_input:SetPoint("TOPRIGHT", f, "TOPRIGHT", -117, 0)
+  search_input:SetHeight(40)
+  search_input:SetScript("OnEnterPressed", OnEnterPressed);
+  search_input:SetScript("OnEscapePressed", OnEscapePressed);
+  search_input:SetAutoFocus(false);
+
+  local search_button = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+  search_button:SetNormalFontObject("GameFontNormalSmall")
+  search_button:SetHighlightFontObject("GameFontHighlightSmall")
+  search_button:SetDisabledFontObject("GameFontDisableSmall")
+  search_button:SetHeight(BUTTON_HEIGHT)
+  search_button:SetPoint("LEFT", search_input, "RIGHT")
+  search_button:SetText("Поиск")
+  search_button:SetWidth(80)
+  search_button:SetScript(
+      "OnClick",
+      function(self, button, down)
+          search_btn(EPGPSearchEditBox:GetText())
+      end)
   f:SetBackdrop(
     {
       bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
