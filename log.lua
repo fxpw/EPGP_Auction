@@ -37,7 +37,7 @@ local function CheckFilter(log, str)
 end
 local LOG_FORMAT = "LOG:%d\31%s\31%s\31%s\31%d\31%s\31%s"
 local function log(...)
-  print("EPGP_SYNC", ...)
+  -- print("EPGP_SYNC", ...)
 end
 
 local function AppendToLog(kind, event_type, name, reason, amount, mass, undo)
@@ -545,7 +545,8 @@ function mod:OnEnable()
   log("Запросили логи начиная с", tostring(latest_time))
 
   for _, log in pairs(logs) do
-      log[6] = log[6] or "Unknown"
+      -- log[6] = log[6] or "Unknown"
+      -- log[8] = log[8] or "Unknown"
       exists_logs[string.format(LOG_FORMAT, unpack(log))] = true
   end
   -- This is kept for historical reasons. See:
