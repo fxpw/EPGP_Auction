@@ -160,7 +160,7 @@ local modulePrototype = {
 }
 EPGP:SetDefaultModulePrototype(modulePrototype)
 
-local version = GetAddOnMetadata('EPGP', 'Version')
+local version = GetAddOnMetadata('EPGP_Auction', 'Version')
 if not version or #version == 0 then
   version = "(development)"
 end
