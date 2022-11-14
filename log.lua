@@ -89,7 +89,7 @@ local function LogRecordToString(record)
   local timestamp, kind, name, reason, amount, diff, who = unpack(record)
   -- print(unpack(record))
   diff = diff or "0"
-
+  who = who or "Unknown"
   if kind == "EP" then
     return string.format("%s: %+d EP (%s) для %s стало %s начисление от %s", date("%Y-%m-%d %H:%M", timestamp), amount, reason,name, diff, who)
   elseif kind == "GP" then
@@ -452,6 +452,8 @@ function mod:EPGP_SYNC_LOG(tag, msg, channel, sender)
 
     if #members_with_logs == 2 then
         local timestamp, kind, name, reason, amount, diff, who = deformat(msg, LOG_FORMAT)
+        diff = diff or "0"
+        who = who or UNKNOWN
         -- if not timestamp then
         --     timestamp, kind, name, reason, amount = deformat(msg, LOG_FORMAT)
         --     diff = "Unknown"
