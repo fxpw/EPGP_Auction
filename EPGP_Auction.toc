@@ -1,5 +1,5 @@
 ## Interface: 30300
-## Title: EPGP
+## Title: EPGP_Auction
 ## Notes: Effort Points/Gear Points Loot System
 ## Author: Alkis Evlogimenos, fxpw and fallafell
 ## Version: 6.01
