@@ -409,7 +409,7 @@ function mod:EPGP_SYNC_REQUEST(tag, msg, channel, sender)
     log("Получили запрос на синхронизацию логов от " .. sender .. ". Отправляем", #logs_for_sync, "логов")
 
     for _, log in ipairs(logs_for_sync) do
-      print(string.format(LOG_FORMAT, unpack(log)))
+      -- print(string.format(LOG_FORMAT, unpack(log)))
         mod:SendCommMessage("EPGP_SYNC_LOG", string.format(LOG_FORMAT, unpack(log)), "WHISPER", sender)
     end
 
@@ -450,7 +450,7 @@ function mod:EPGP_SYNC_LOG(tag, msg, channel, sender)
     end
     sync_logs[msg] = members_with_logs
 
-    if #members_with_logs == 2 then
+    if #members_with_logs == 1 then
         local timestamp, kind, name, reason, amount, diff, who = deformat(msg, LOG_FORMAT)
         diff = diff or "0"
         who = who or UNKNOWN
