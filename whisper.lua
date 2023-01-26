@@ -29,18 +29,18 @@ function mod:CHAT_MSG_WHISPER(event_name, msg, sender)
 
   if not EPGP:GetEPGP(member) then
     SendChatMessage(L["%s is not eligible for EP awards"]:format(member),
-                    "OFFICER", nil)
+                    "GUILD", nil)
   elseif EPGP:IsMemberInAwardList(member) then
     SendChatMessage(L["%s is already in the award list"]:format(member),
-                    "OFFICER", nil)
+                    "GUILD", nil)
   elseif isDelete then
-    SendChatMessage(("%s удален из начисления"):format(member),"OFFICER", nil)
+    SendChatMessage(("%s удален из начисления"):format(member),"GUILD", nil)
     senderMap[member] = nil
     EPGP:DeSelectMember(member)
   else
     EPGP:SelectMember(member)
     SendChatMessage(L["%s is added to the award list"]:format(member),
-                    "OFFICER", nil)
+                    "GUILD", nil)
   end
 end
 
@@ -65,7 +65,7 @@ local function SendNotifiesAndClearExtras(event_name, names, reason, amount, ext
       if sender then
         SendChatMessage(L["%+d EP (%s) to %s"]:format(
                           extras_amount, extras_reason, member),
-                        "OFFICER", nil)
+                        "GUILD", nil)
         -- EPGP:DeSelectMember(member)
         -- SendChatMessage(
         --   L["%s is now removed from the award list"]:format(member),
