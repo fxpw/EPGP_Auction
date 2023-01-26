@@ -14,8 +14,8 @@ end
 function mod:CHAT_MSG_WHISPER(event_name, msg, sender)
   if not UnitInRaid("player") then return end
 
-  if msg:sub(1, 12):lower() ~= 'epgp standby' then return end
-
+  if msg:sub(1, 12):lower() ~= 'epgp standby' or msg:sub(1, 12):lower() ~= 'epgp nstndby' then return end
+  local isDelete = msg:sub(1, 12):lower() == 'epgp nstndby'
   local member = msg:sub(13):match("([^ ]+)")
   if member then
     -- http://lua-users.org/wiki/LuaUnicode
@@ -29,14 +29,18 @@ function mod:CHAT_MSG_WHISPER(event_name, msg, sender)
 
   if not EPGP:GetEPGP(member) then
     SendChatMessage(L["%s is not eligible for EP awards"]:format(member),
-                    "WHISPER", nil, sender)
+                    "OFFICER", nil)
   elseif EPGP:IsMemberInAwardList(member) then
     SendChatMessage(L["%s is already in the award list"]:format(member),
-                    "WHISPER", nil, sender)
+                    "OFFICER", nil)
+  elseif isDelete then
+    SendChatMessage(("%s удален из начисления"):format(member),"OFFICER", nil)
+    senderMap[member] = nil
+    EPGP:DeSelectMember(member)
   else
     EPGP:SelectMember(member)
     SendChatMessage(L["%s is added to the award list"]:format(member),
-                    "WHISPER", nil, sender)
+                    "OFFICER", nil)
   end
 end
 
@@ -47,9 +51,7 @@ local function AnnounceMedium()
   end
 end
 
-local function SendNotifiesAndClearExtras(
-    event_name, names, reason, amount,
-    extras_awarded, extras_reason, extras_amount)
+local function SendNotifiesAndClearExtras(event_name, names, reason, amount, extras_awarded, extras_reason, extras_amount)
   local medium = AnnounceMedium()
   if medium then
     EPGP:GetModule("announce"):AnnounceTo(
@@ -63,13 +65,13 @@ local function SendNotifiesAndClearExtras(
       if sender then
         SendChatMessage(L["%+d EP (%s) to %s"]:format(
                           extras_amount, extras_reason, member),
-                        "WHISPER", nil, sender)
-        EPGP:DeSelectMember(member)
-        SendChatMessage(
-          L["%s is now removed from the award list"]:format(member),
-          "WHISPER", nil, sender)
+                        "OFFICER", nil)
+        -- EPGP:DeSelectMember(member)
+        -- SendChatMessage(
+        --   L["%s is now removed from the award list"]:format(member),
+        --   "OFFICER", nil)
       end
-      senderMap[member] = nil
+      -- senderMap[member] = nil
     end
   end
 end
