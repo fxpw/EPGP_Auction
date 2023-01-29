@@ -11,10 +11,15 @@ if ChatThrottleLib then
                     end
 end
 
+local tableForNext = {
+  ["epgp standby"] = true,
+  ["epgp nstndby"] = true
+}
 function mod:CHAT_MSG_WHISPER(event_name, msg, sender)
   if not UnitInRaid("player") then return end
-
-  if msg:sub(1, 12):lower() ~= 'epgp standby' or msg:sub(1, 12):lower() ~= 'epgp nstndby' then return end
+  -- print(msg:sub(1, 12):lower() == 'epgp standby')
+  if not tableForNext[msg:sub(1, 12):lower()] then return end
+  -- print('da')
   local isDelete = msg:sub(1, 12):lower() == 'epgp nstndby'
   local member = msg:sub(13):match("([^ ]+)")
   if member then
@@ -30,13 +35,13 @@ function mod:CHAT_MSG_WHISPER(event_name, msg, sender)
   if not EPGP:GetEPGP(member) then
     SendChatMessage(L["%s is not eligible for EP awards"]:format(member),
                     "GUILD", nil)
-  elseif EPGP:IsMemberInAwardList(member) then
-    SendChatMessage(L["%s is already in the award list"]:format(member),
-                    "GUILD", nil)
   elseif isDelete then
     SendChatMessage(("%s удален из начисления"):format(member),"GUILD", nil)
     senderMap[member] = nil
     EPGP:DeSelectMember(member)
+  elseif EPGP:IsMemberInAwardList(member) then
+    SendChatMessage(L["%s is already in the award list"]:format(member),
+                    "GUILD", nil)
   else
     EPGP:SelectMember(member)
     SendChatMessage(L["%s is added to the award list"]:format(member),
