@@ -142,9 +142,10 @@ function mod:GetLastActionForUndo()
 
   for i = #self.db.profile.log, 1, -1 do
       local log = self.db.profile.log[i]
-
       local is_undo = string.starts(log[4], L["Undo"])
+
       if not is_undo and skip_count == 0 then
+          table.remove(self.db.profile.log,i)
           return log
       end
 
@@ -193,7 +194,8 @@ end
 function mod:RedoLastUndo()
   assert(#self.db.profile.redo ~= 0)
 
-  local record = next(self.db.profile.redo)
+  local record = table.remove(self.db.profile.redo)
+  if type(record) ~= "table" then return end
   local timestamp, kind, name, reason, amount, diff = unpack(record)
 
   local ep, gp, main = EPGP:GetEPGP(name)
