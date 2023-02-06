@@ -2,7 +2,7 @@
 ## Title: EPGP_Auction
 ## Notes: Effort Points/Gear Points Loot System
 ## Author: Alkis Evlogimenos, fxpw and fallafell
-## Version: 6.02
+## Version: 6.03
 ## OptionalDeps: DBM-Core BigWigs_Core
 ## SavedVariables: EPGP_DB
 ## X-Category: Guild
