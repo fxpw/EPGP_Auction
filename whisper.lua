@@ -19,7 +19,6 @@ function mod:CHAT_MSG_WHISPER(event_name, msg, sender)
   if not UnitInRaid("player") then return end
   -- print(msg:sub(1, 12):lower() == 'epgp standby')
   if not tableForNext[msg:sub(1, 12):lower()] then return end
-  -- print('da')
   local isDelete = msg:sub(1, 12):lower() == 'epgp nstndby'
   local member = msg:sub(13):match("([^ ]+)")
   if member then
