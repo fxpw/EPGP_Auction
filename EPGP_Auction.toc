@@ -7,7 +7,7 @@
 ## SavedVariables: EPGP_DB
 ## X-Category: Guild
 ## X-Website: http://code.google.com/p/epgp/
-
+## X-Sirus-Update: https://github.com/fxpw/EPGP_Auction/tree/master
 libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
 libs\AceAddon-3.0\AceAddon-3.0.xml
